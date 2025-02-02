@@ -5,16 +5,11 @@
 
 #pragma once
 #import <Foundation/Foundation.h>
-#include <stdexcept>
 
-class BuildBotError : public std::runtime_error
-{
-public:
-    using std::runtime_error::runtime_error;
-};
-
-NSString* getWorkingDirectory();
+NSString* getWorkingDirectory(void);
 
 bool directoryExists(NSString* path);
 
 void createDirectory(NSString* path);
+
+void runShellCommand(NSString* exe, NSArray<NSString*>* args);
