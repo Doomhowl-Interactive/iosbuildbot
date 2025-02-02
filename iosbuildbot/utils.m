@@ -5,6 +5,10 @@
 
 #import "utils.h"
 
+#include <unistd.h>
+
+static NSString *const EXCEPTION = @"UtilsException";
+
 NSString* getWorkingDirectory(void)
 {
     return [[NSProcessInfo processInfo] environment][@"PWD"];
@@ -30,7 +34,7 @@ void createDirectory(NSString* path)
                                                                   error:&error];
         if (!success) {
             NSString *msg = [NSString stringWithFormat:@"Failed to create directory: %@, Error: %@", path, error.localizedDescription];
-            @throw [NSException exceptionWithName:@"BuildbotException" reason:msg userInfo:nil];
+            @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
         }
     }
 }
@@ -50,10 +54,22 @@ NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args) {
             [task launch];
         } @catch (NSException *exception) {
             NSString* msg = [NSString stringWithFormat:@"Failed to launch shell task: %@", exception.reason];
-            @throw [NSException exceptionWithName:@"BuildbotException" reason:msg userInfo:nil];
+            @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
         }
         
         NSData *data = [file readDataToEndOfFile];
         return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }
+}
+
+void changeWorkingDirectory(NSString *directoryPath)
+{
+    const char *path = [directoryPath UTF8String];
+    
+    if (chdir(path) == 0) {
+        NSLog(@"Successfully changed working directory to: %@", directoryPath);
+    } else {
+        NSString* msg = [NSString stringWithFormat:@"Failed to change working directory to: %@, Error: %s", directoryPath, strerror(errno)];
+        @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
     }
 }

@@ -5,12 +5,26 @@
 
 #import "utils.h"
 #import "Git.h"
+#import "ConfigFile.h"
+
 #import <Foundation/Foundation.h>
+
+static NSString *const EXCEPTION = @"BuildbotException";
 
 int main(int argc, const char * argv[])
 {
     @autoreleasepool {
+        // TODO: unhardcode
+        changeWorkingDirectory(@"/Users/bram/dev/iosbuildbot/work");
+        
         NSLog(@"Running ios buildbot at: %@", getWorkingDirectory());
+            
+        ConfigFile* config = [[ConfigFile alloc] initFromFile:@"config.ini"];
+        if (config.isEmpty) {
+            @throw [NSException exceptionWithName:EXCEPTION
+                                           reason:@"Config file does not list any repos"
+                                         userInfo:nil];
+        }
         
         NSString* cloneDir = @"cloned";
         createDirectory(cloneDir);
@@ -18,7 +32,15 @@ int main(int argc, const char * argv[])
         NSString* gitExe = runShellCommand(@"/usr/bin/which", @[@"git"]);
         Git* git = [[Git alloc] init:gitExe];
         
-        [git clone:@"nlohmann/json" branch:@"v3.11.3" outDirParent:cloneDir];
+        for (NSString *repo in config.repos) {
+            if (directoryExists(repo)) {
+                NSLog(@"Repo %@ already cloned.", repo);
+            } else {
+                NSLog(@"Cloning repo %@", repo);
+                // TODO: parse branch
+                [git clone:repo branch:@"v3.11.3" outDirParent:cloneDir];
+            }
+        }
     }
     return 0;
 }

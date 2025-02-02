@@ -9,11 +9,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Git : NSObject
 
--(nonnull instancetype) init: (nonnull NSString*) gitPath;
+@property NSString* exe;
 
--(void) clone: (nonnull NSString*) repo
-       branch: (nonnull NSString*) branch
-       outDirParent: (nonnull NSString*) outDirParent;
+-(instancetype) init: (NSString*) gitPath;
+
+-(void) clone: (NSString*) repo
+       branch: (NSString*) branch
+       outDirParent: (NSString*) outDirParent;
 
 @end
 

@@ -11,7 +11,7 @@
 {
     self = [super init];
     if (self) {
-        
+        self.exe = gitPath;
     }
     return self;
 }

@@ -13,3 +13,5 @@ bool directoryExists(NSString* path);
 void createDirectory(NSString* path);
 
 NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args);
+
+void changeWorkingDirectory(NSString *directoryPath);
