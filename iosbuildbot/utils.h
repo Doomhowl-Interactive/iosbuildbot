@@ -12,4 +12,4 @@ bool directoryExists(NSString* path);
 
 void createDirectory(NSString* path);
 
-void runShellCommand(NSString* exe, NSArray<NSString*>* args);
+NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args);

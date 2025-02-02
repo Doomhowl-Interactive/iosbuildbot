@@ -35,25 +35,25 @@ void createDirectory(NSString* path)
     }
 }
 
-void runShellCommand(NSString* exe, NSArray<NSString*>* args) {
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = @"/bin/ls";
-    task.arguments = args;
-
-    NSPipe *pipe = [NSPipe pipe];
-    task.standardOutput = pipe;
-
-    NSFileHandle *file = [pipe fileHandleForReading];
-
-    @try {
-        [task launch];
-    } @catch (NSException *exception) {
-        NSLog(@"Failed to launch task: %@", exception.reason);
-        return;
+NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args) {
+    @autoreleasepool {
+        NSTask *task = [[NSTask alloc] init];
+        task.launchPath = exe;
+        task.arguments = args;
+        
+        NSPipe *pipe = [NSPipe pipe];
+        task.standardOutput = pipe;
+        
+        NSFileHandle *file = [pipe fileHandleForReading];
+        
+        @try {
+            [task launch];
+        } @catch (NSException *exception) {
+            NSString* msg = [NSString stringWithFormat:@"Failed to launch shell task: %@", exception.reason];
+            @throw [NSException exceptionWithName:@"BuildbotException" reason:msg userInfo:nil];
+        }
+        
+        NSData *data = [file readDataToEndOfFile];
+        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     }
-
-    NSData *data = [file readDataToEndOfFile];
-    NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
-    NSLog(@">>> %@", output);
 }
