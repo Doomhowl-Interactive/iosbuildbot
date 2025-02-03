@@ -9,16 +9,27 @@
 
 static NSString *const EXCEPTION = @"UtilsException";
 
+BOOL fileExists(NSString* path)
+{
+    BOOL isDirectory;
+    BOOL exists = [[NSFileManager defaultManager]
+                   fileExistsAtPath:path
+                        isDirectory:&isDirectory];
+    return exists && !isDirectory;
+}
+
+BOOL directoryExists(NSString* path)
+{
+    BOOL isDirectory;
+    BOOL exists = [[NSFileManager defaultManager]
+                   fileExistsAtPath:path
+                        isDirectory:&isDirectory];
+    return exists && isDirectory;
+}
+
 NSString* getWorkingDirectory(void)
 {
     return [[NSProcessInfo processInfo] environment][@"PWD"];
-}
-
-bool directoryExists(NSString* path)
-{
-    BOOL isDirectory;
-    BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path                                                                                                                isDirectory:&isDirectory];
-    return exists && isDirectory;
 }
 
 void createDirectory(NSString* path)

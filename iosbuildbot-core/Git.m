@@ -17,7 +17,7 @@
 }
 
 - (void)        cloneRaw:(nonnull NSString *)url
-                     tag:(nonnull NSString *)tag
+                     tag:(nullable NSString *)tag
             outDirParent:(nonnull NSString *)outDirParent
 {
     @throw [NSException exceptionWithName:@"BuildbotException" reason:@"Not implemented" userInfo:nil];
@@ -31,7 +31,7 @@
        outDirParent:outDirParent ];
 }
 
--(struct Repo) parseRepoName: (NSString*) line
+-(struct Repo) parseRepoLine: (NSString*) line
 {
     struct Repo r;
     if ([line containsString:@"@"] || [line hasPrefix:@"http://"] || [line hasPrefix:@"https://"])

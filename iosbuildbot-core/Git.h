@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 struct Repo
 {
-    NSString* name;
+    NSString* authorAndName;
     NSString* url;
     NSString* tag;
 };
@@ -24,10 +24,10 @@ struct Repo
             outDirParent: (NSString*) outDirParent;
 
 -(void)         cloneRaw: (NSString*) url
-                     tag: (NSString*) tag
+                     tag: (nullable NSString*) tag
             outDirParent: (NSString*) outDirParent;
 
--(struct Repo) parseRepoName: (NSString*) line;
+-(struct Repo) parseRepoLine: (NSString*) line;
 
 @end
 

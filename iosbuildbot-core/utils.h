@@ -8,7 +8,9 @@
 
 NSString* getWorkingDirectory(void);
 
-bool directoryExists(NSString* path);
+BOOL fileExists(NSString* path);
+
+BOOL directoryExists(NSString* path);
 
 void createDirectory(NSString* path);
 
