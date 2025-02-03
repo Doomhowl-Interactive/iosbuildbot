@@ -6,6 +6,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
+#define let __auto_type
+
 NSString* getWorkingDirectory(void);
 
 BOOL fileExists(NSString* path);
