@@ -32,11 +32,12 @@ int main(int argc, const char * argv[])
         NSString* gitExe = runShellCommand(@"/usr/bin/which", @[@"git"]);
         Git* git = [[Git alloc] init:gitExe];
         
-        for (NSString *repo in config.repos) {
-            if (directoryExists(repo)) {
-                NSLog(@"Repo %@ already cloned.", repo);
+        for (NSString *line in config.repos) {
+            struct Repo repo = parseRepoName(line);
+            if (directoryExists(repo.name)) {
+                NSLog(@"Repo %@ already cloned.", repo.name);
             } else {
-                NSLog(@"Cloning repo %@", repo);
+                NSLog(@"Cloning repo %@ with tag %@", repo.name, repo.tag);
                 // TODO: parse branch
                 [git clone:repo branch:@"v3.11.3" outDirParent:cloneDir];
             }

@@ -16,9 +16,29 @@
     return self;
 }
 
-- (void)clone:(nonnull NSString *)repo branch:(nonnull NSString *)branch outDirParent:(nonnull NSString *)outDirParent
+- (void)        cloneRaw:(nonnull NSString *)url
+                     tag:(nonnull NSString *)tag
+            outDirParent:(nonnull NSString *)outDirParent
 {
     @throw [NSException exceptionWithName:@"BuildbotException" reason:@"Not implemented" userInfo:nil];
+}
+
+-(void)         clone: (struct Repo) repo
+         outDirParent: (NSString*) outDirParent
+{
+    [ self cloneRaw:repo.url
+                tag:repo.tag
+       outDirParent:outDirParent ];
+}
+
+-(struct Repo) parseRepoName: (NSString*) line
+{
+    struct Repo r;
+    if ([line containsString:@"@"] || [line hasPrefix:@"http://"] || [line hasPrefix:@"https://"])
+    {
+        r.url = r.url;
+    }
+    return r;
 }
 
 @end
