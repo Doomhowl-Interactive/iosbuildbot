@@ -20,12 +20,17 @@ struct Repo
 
 -(instancetype) init: (NSString*) gitPath;
 
+-(void)  cloneIfNotAlready: (struct Repo) repo
+              outDirParent: (NSString*) outDirParent;
+
 -(void)            clone: (struct Repo) repo
             outDirParent: (NSString*) outDirParent;
 
 -(void)         cloneRaw: (NSString*) url
                      tag: (nullable NSString*) tag
-            outDirParent: (NSString*) outDirParent;
+                 destDir: (NSString*) outDirParent;
+
+-(NSString*) formOutputPath: (NSString*)outDirParent repo: (struct Repo) repo;
 
 -(struct Repo) parseRepoLine: (NSString*) line;
 

@@ -8,6 +8,8 @@
 
 #define let __auto_type
 
+// TODO: split into classes
+
 NSString* getWorkingDirectory(void);
 
 BOOL fileExists(NSString* path);
@@ -16,7 +18,7 @@ BOOL directoryExists(NSString* path);
 
 void createDirectory(NSString* path);
 
-NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args);
+NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args, BOOL silent);
 
 void changeWorkingDirectory(NSString *directoryPath);
 

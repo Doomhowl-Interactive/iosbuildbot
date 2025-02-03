@@ -15,7 +15,7 @@ static NSString *const EXCEPTION = @"BuildbotException";
 -(void) run
 {
     // TODO: unhardcode
-    changeWorkingDirectory(@"/Users/bram/dev/iosbuildbot/work");
+    changeWorkingDirectory(@"/Users/bram/dev/iosbuildbot");
     
     NSLog(@"Running ios buildbot at: %@", getWorkingDirectory());
         
@@ -26,9 +26,16 @@ static NSString *const EXCEPTION = @"BuildbotException";
                                      userInfo:nil];
     }
     
-    NSString* cloneDir = @"cloned";
+    NSString* workDir = @"work";
+    createDirectory(workDir);
+    
+    NSString* cloneDir = [NSString pathWithComponents:@[workDir, @"cloned"]];
     createDirectory(cloneDir);
     
+    NSString* buildDir = [NSString pathWithComponents:@[workDir, @"build"]];
+    createDirectory(cloneDir);
+    
+    // Check if tooling is present
     NSString* gitExe;
     if (!findProgramInPath(@"git", &gitExe)) {
         @throw [NSException exceptionWithName:EXCEPTION
@@ -47,11 +54,14 @@ static NSString *const EXCEPTION = @"BuildbotException";
     
     for (NSString *line in config.lines) {
         struct Repo repo = [git parseRepoLine:line];
-        if (directoryExists(repo.authorAndName)) {
-            NSLog(@"Repo %@ already cloned.", repo.authorAndName);
-        } else {
-            NSLog(@"Cloning repo %@ with tag %@", repo.authorAndName, repo.tag);
-        }
+        [git cloneIfNotAlready:repo outDirParent:cloneDir];
+        
+        // configure cmake
+        let sourceDir = [git formOutputPath:cloneDir repo:repo];
+        let fullBuildDir = [git formOutputPath:buildDir repo:repo];
+        createDirectory(fullBuildDir);
+        
+        runShellCommand(cmakeExe, @[@"-S", sourceDir, @"-B", fullBuildDir, @"-G Xcode"], NO);
     }
 }
 

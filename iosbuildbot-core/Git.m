@@ -21,9 +21,21 @@ static NSString *const EXCEPTION = @"GitException";
 
 - (void)        cloneRaw:(nonnull NSString *)url
                      tag:(nullable NSString *)tag
-            outDirParent:(nonnull NSString *)outDirParent
+                 destDir:(nonnull NSString *)destDir
 {
-    @throw [NSException exceptionWithName:@"BuildbotException" reason:@"Not implemented" userInfo:nil];
+    NSMutableArray<NSString*>* args = [NSMutableArray<NSString*> arrayWithCapacity:10];
+    [args addObjectsFromArray:@[@"clone", url]];
+    if (tag != NULL) {
+        [ args addObjectsFromArray:@[@"-b", tag] ];
+    }
+    [args addObjectsFromArray:@[destDir]];
+    [args addObjectsFromArray:@[@"--depth", @"1"]];
+    runShellCommand(self.exe, args, NO);
+}
+
+-(NSString*) formOutputPath: (NSString*)outDirParent repo: (struct Repo) repo
+{
+    return [NSString pathWithComponents:@[outDirParent, repo.authorAndName]];
 }
 
 -(void)         clone: (struct Repo) repo
@@ -31,7 +43,17 @@ static NSString *const EXCEPTION = @"GitException";
 {
     [ self cloneRaw:repo.url
                 tag:repo.tag
-       outDirParent:outDirParent ];
+            destDir:[self formOutputPath:outDirParent repo:repo] ];
+}
+
+-(void)  cloneIfNotAlready: (struct Repo) repo
+              outDirParent: (NSString*) outDirParent
+{
+    if (directoryExists([self formOutputPath:outDirParent repo:repo])) {
+        NSLog(@"Already cloned repo %@", repo.authorAndName);
+    } else {
+        [self clone:repo outDirParent:outDirParent];
+    }
 }
 
 -(struct Repo) parseRepoLine: (NSString*) line

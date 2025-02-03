@@ -2,7 +2,7 @@
  * Copyright (c) 2025. Doomhowl Interactive - MIT License
  * File created on: 02-02-2025
  */
-
+#import "ShellCommandRunner.h"
 #import "utils.h"
 
 #include <unistd.h>
@@ -27,11 +27,6 @@ BOOL directoryExists(NSString* path)
     return exists && isDirectory;
 }
 
-NSString* getWorkingDirectory(void)
-{
-    return [[NSProcessInfo processInfo] environment][@"PWD"];
-}
-
 void createDirectory(NSString* path)
 {
     BOOL success = true;
@@ -50,27 +45,9 @@ void createDirectory(NSString* path)
     }
 }
 
-NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args) {
-    @autoreleasepool {
-        NSTask *task = [[NSTask alloc] init];
-        task.launchPath = exe;
-        task.arguments = args;
-        
-        NSPipe *pipe = [NSPipe pipe];
-        task.standardOutput = pipe;
-        
-        NSFileHandle *file = [pipe fileHandleForReading];
-        
-        @try {
-            [task launch];
-        } @catch (NSException *exception) {
-            NSString* msg = [NSString stringWithFormat:@"Failed to launch shell task: %@", exception.reason];
-            @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
-        }
-        
-        NSData *data = [file readDataToEndOfFile];
-        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    }
+NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args, BOOL silent) {
+    ShellCommandRunner *runner = [[ShellCommandRunner alloc] init];
+    return [runner runShellCommand:exe args:args silent:silent];
 }
 
 void changeWorkingDirectory(NSString *directoryPath)
@@ -85,9 +62,20 @@ void changeWorkingDirectory(NSString *directoryPath)
     }
 }
 
+NSString* getWorkingDirectory(void)
+{
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        return [NSString stringWithUTF8String:cwd];
+    } else {
+        NSString* msg = [NSString stringWithFormat:@"Failed to get working directory, Error: %s", strerror(errno)];
+        @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
+    }
+}
+
 BOOL findProgramInPath(NSString* program, NSString** outExePath)
 {
-    NSString* exe = runShellCommand(@"/usr/bin/which", @[program]);
+    NSString* exe = runShellCommand(@"/usr/bin/which", @[program], YES);
     exe = [exe stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     if (fileExists(exe)) {
         if (outExePath) {
