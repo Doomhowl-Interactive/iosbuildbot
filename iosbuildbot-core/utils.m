@@ -84,3 +84,18 @@ void changeWorkingDirectory(NSString *directoryPath)
         @throw [NSException exceptionWithName:EXCEPTION reason:msg userInfo:nil];
     }
 }
+
+BOOL findProgramInPath(NSString* program, NSString** outExePath)
+{
+    NSString* exe = runShellCommand(@"/usr/bin/which", @[program]);
+    exe = [exe stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    if (fileExists(exe)) {
+        if (outExePath) {
+            *outExePath = exe;
+        }
+        return YES;
+    } else if (outExePath) {
+        *outExePath = NULL;
+    }
+    return NO;
+}

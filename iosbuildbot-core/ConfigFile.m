@@ -13,9 +13,26 @@ static NSString *const EXCEPTION = @"ConfigFileException";
     self = [super init];
     if (self) {
         self.content = [self readFile:path];
-        self.repos = [self.content componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        self.lines = [self parseLines];
     }
     return self;
+}
+
+- (nonnull instancetype)initFromBuffer:(nonnull NSString *)buffer
+{
+    self = [self init];
+    if (self) {
+        self.content = buffer;
+        self.lines = [self parseLines];
+    }
+    return self;
+}
+
+-(NSArray*) parseLines
+{
+    return [[self.content componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *bindings) {
+        return [[((NSString*)object) stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] > 0;
+    }]];
 }
 
 - (nonnull NSString*) readFile: (nonnull NSString*) filePath
@@ -35,9 +52,11 @@ static NSString *const EXCEPTION = @"ConfigFileException";
     return fileContents;
 }
 
+
+
 - (BOOL) isEmpty
 {
-    return [self.repos count] == 0;
+    return [self.lines count] == 0;
 }
 
 @end

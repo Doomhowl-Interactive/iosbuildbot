@@ -19,3 +19,5 @@ void createDirectory(NSString* path);
 NSString* runShellCommand(NSString* exe, NSArray<NSString*>* args);
 
 void changeWorkingDirectory(NSString *directoryPath);
+
+BOOL findProgramInPath(NSString* program, NSString** outExePath);

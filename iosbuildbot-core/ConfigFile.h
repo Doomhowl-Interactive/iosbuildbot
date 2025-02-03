@@ -9,10 +9,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ConfigFile : NSObject
 
-@property NSArray<NSString*>* repos;
+@property NSArray<NSString*>* lines;
 @property NSString* content;
 
 -(instancetype) initFromFile: (NSString*) path;
+
+-(instancetype) initFromBuffer: (NSString*) buffer;
+
+-(NSArray*) parseLines;
 
 -(BOOL) isEmpty;
 

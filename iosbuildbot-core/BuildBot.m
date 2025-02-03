@@ -29,16 +29,23 @@ static NSString *const EXCEPTION = @"BuildbotException";
     NSString* cloneDir = @"cloned";
     createDirectory(cloneDir);
     
-    NSString* gitExe = runShellCommand(@"/usr/bin/which", @[@"git"]);
-    if (!fileExists(gitExe)) {
+    NSString* gitExe;
+    if (!findProgramInPath(@"git", &gitExe)) {
         @throw [NSException exceptionWithName:EXCEPTION
                                        reason:@"Git could not be found."
                                      userInfo:nil];
     }
     
+    NSString* cmakeExe;
+    if (!findProgramInPath(@"cmake", &cmakeExe)) {
+        @throw [NSException exceptionWithName:EXCEPTION
+                                       reason:@"CMake could not be found."
+                                     userInfo:nil];
+    }
+    
     Git* git = [[Git alloc] init:gitExe];
     
-    for (NSString *line in config.repos) {
+    for (NSString *line in config.lines) {
         struct Repo repo = [git parseRepoLine:line];
         if (directoryExists(repo.authorAndName)) {
             NSLog(@"Repo %@ already cloned.", repo.authorAndName);

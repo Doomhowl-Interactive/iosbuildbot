@@ -11,7 +11,7 @@ struct Repo
 {
     NSString* authorAndName;
     NSString* url;
-    NSString* tag;
+    NSString* _Nullable tag;
 };
 
 @interface Git : NSObject
