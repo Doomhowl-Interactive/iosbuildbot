@@ -14,9 +14,6 @@ static NSString *const EXCEPTION = @"BuildbotException";
 
 -(void) run
 {
-    // TODO: unhardcode
-    changeWorkingDirectory(@"/Users/bram/dev/iosbuildbot");
-    
     NSLog(@"Running ios buildbot at: %@", getWorkingDirectory());
         
     ConfigFile* config = [[ConfigFile alloc] initFromFile:@"config.ini"];
