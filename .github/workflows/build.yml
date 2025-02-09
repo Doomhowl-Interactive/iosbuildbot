@@ -7,7 +7,8 @@ on:
 
 jobs:
   build-and-run:
-    runs-on: macos-latest
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 10
 
     steps:
       - name: Checkout Repository
