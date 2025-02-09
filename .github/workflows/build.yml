@@ -1,0 +1,26 @@
+name: Build and Run Xcode Project
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-run:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Build Xcode Project
+        run: xcodebuild build -configuration Release
+
+      - name: Run Executable
+        working-directory: ${{ github.workspace }}
+        run: |
+          chmod +x build/Release/iosbuildbot
+          ./build/Release/iosbuildbot
