@@ -33,7 +33,10 @@ static NSString *const EXCEPTION = @"BuildbotException";
     createDirectory(cloneDir);
     
     NSString* buildDir = [NSString pathWithComponents:@[workDir, @"build"]];
-    createDirectory(cloneDir);
+    createDirectory(buildDir);
+    
+    NSString* installDir = @"docs";
+    createDirectory(installDir);
     
     // Check if tooling is present
     NSString* gitExe;
@@ -51,6 +54,10 @@ static NSString *const EXCEPTION = @"BuildbotException";
     }
     
     Git* git = [[Git alloc] init:gitExe];
+        
+    struct Repo toolchainRepo = [git parseRepoLine:@"leetal/ios-cmake"];
+    [git cloneIfNotAlready:toolchainRepo outDirParent:cloneDir];
+    let toolchainFilePath = [ NSString stringWithFormat:@"%@/leetal/ios-cmake/ios.toolchain.cmake", cloneDir ];
     
     for (NSString *line in config.lines) {
         struct Repo repo = [git parseRepoLine:line];
@@ -60,8 +67,16 @@ static NSString *const EXCEPTION = @"BuildbotException";
         let sourceDir = [git formOutputPath:cloneDir repo:repo];
         let fullBuildDir = [git formOutputPath:buildDir repo:repo];
         createDirectory(fullBuildDir);
+        let fullInstallDir = [git formOutputPath:installDir repo:repo];
         
-        runShellCommand(cmakeExe, @[@"-S", sourceDir, @"-B", fullBuildDir, @"-G Xcode"], NO);
+        let dToolchainFile = [NSString stringWithFormat:@"-DCMAKE_TOOLCHAIN_FILE=%@/%@", getWorkingDirectory(), toolchainFilePath];
+        let dInstallPrefix = [NSString stringWithFormat:@"-DCMAKE_INSTALL_PREFIX=%@", fullInstallDir];
+        
+        runShellCommand(cmakeExe, @[@"-S", sourceDir, @"-B", fullBuildDir, @"-G Xcode", @"-DBUILD_SHARED_LIBS=OFF", @"-DCMAKE_BUILD_TYPE=Release", dToolchainFile, @"-DPLATFORM=OS64COMBINED", dInstallPrefix], NO);
+        
+        runShellCommand(cmakeExe, @[@"--build", fullBuildDir, @"--parallel", @"--config", @"Release"], NO);
+        
+        runShellCommand(cmakeExe, @[@"--install", fullBuildDir, @"--config", @"Release"], NO);
     }
 }
 
