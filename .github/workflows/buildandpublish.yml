@@ -1,0 +1,44 @@
+name: Build and Run Xcode Project
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-run:
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 10
+
+    steps:
+      - name: Clean Workspace
+        run: |
+          echo "Cleaning workspace..."
+          shopt -s extglob
+          rm -rf !( ".git" ) || true
+          echo "Workspace cleaned."
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Xcode Project
+        run: xcodebuild build -configuration Release
+
+      - name: Run Executable
+        working-directory: ${{ github.workspace }}
+        run: |
+          chmod +x build/Release/iosbuildbot
+          ./build/Release/iosbuildbot
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

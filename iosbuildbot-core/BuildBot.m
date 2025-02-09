@@ -14,9 +14,6 @@ static NSString *const EXCEPTION = @"BuildbotException";
 
 -(void) run
 {
-    // TODO: unhardcode
-    changeWorkingDirectory(@"/Users/bram/dev/iosbuildbot");
-    
     NSLog(@"Running ios buildbot at: %@", getWorkingDirectory());
         
     ConfigFile* config = [[ConfigFile alloc] initFromFile:@"config.ini"];
@@ -72,7 +69,7 @@ static NSString *const EXCEPTION = @"BuildbotException";
         let dToolchainFile = [NSString stringWithFormat:@"-DCMAKE_TOOLCHAIN_FILE=%@/%@", getWorkingDirectory(), toolchainFilePath];
         let dInstallPrefix = [NSString stringWithFormat:@"-DCMAKE_INSTALL_PREFIX=%@", fullInstallDir];
         
-        runShellCommand(cmakeExe, @[@"-S", sourceDir, @"-B", fullBuildDir, @"-G Xcode", @"-DBUILD_SHARED_LIBS=OFF", @"-DCMAKE_BUILD_TYPE=Release", dToolchainFile, @"-DPLATFORM=OS64COMBINED", dInstallPrefix], NO);
+        runShellCommand(cmakeExe, @[@"-S", sourceDir, @"-B", fullBuildDir, @"-G Xcode", @"-DCMAKE_BUILD_TYPE=Release", dToolchainFile, @"-DPLATFORM=OS64COMBINED", dInstallPrefix], NO);
         
         runShellCommand(cmakeExe, @[@"--build", fullBuildDir, @"--parallel", @"--config", @"Release"], NO);
         
