@@ -1,5 +1,7 @@
 xcuserdata/
 work/*
+docs
+install
 iosbuildbot.xcodeproj/xcuserdata
 build
 
